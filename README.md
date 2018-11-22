@@ -29,13 +29,16 @@
 - SSH
 - Systemd
 
-## 操作系统
+## 系统版本
 
 coreos 1745.5.0 测试通过
 
 强烈推荐在 coreos　安装，省时省力、坑少、Docker原生态
 
+ETCD和Kubernetes 下列版本测试通过　
+
 ETCD 3.3.10
+
 kubernetes 1.10.x 1.11.x 1.12.x
 
 
@@ -43,13 +46,35 @@ kubernetes 1.10.x 1.11.x 1.12.x
 
 - 发布机到目标机配置 ssh 无密码登录
 
+- 准备 ETCD 集群
+    
+    可参见 etcd-operator　项目
+
 - env目录下配置环境相应变量，例如开发环境 dev.sh：
+
+    下列４个参数必须配置
+
+    ```
+    # Master 节点地址列表
+    MASTERS
+
+    # Worker节点地址列表
+    NODES
+
+    # ETCD集群连接地址
+    ETCD_SERVERS
+
+    # ETCD 集群证书路径
+    LOCAL_ETCD_CERT_DIR
+    ```
 
     ```bash
     #!/usr/bin/env bash
 
     export MASTERS=("10.200.0.15 10.200.0.14 10.200.0.13")
     export NODES=("10.200.0.12 10.200.0.11 10.200.0.10")
+    export ETCD_SERVERS="https://10.200.0.15:2379,https://10.200.0.14:2379,https://10.200.0.13:2379"
+    export LOCAL_ETCD_CERT_DIR="${ENV_ROOT}/../etcd/cert/dev"
     ```
 
     可配置的变量参见　config-default.sh　中的定义

@@ -4,17 +4,18 @@ set -e
 
 readonly ENV_ROOT=$(cd $(dirname "${BASH_SOURCE}")/.. && pwd)
 
+# 必填项
 export MASTERS=("10.200.0.15 10.200.0.14 10.200.0.13")
 export NODES=("10.200.0.14")
+export ETCD_SERVERS="https://10.200.0.15:2379,https://10.200.0.14:2379,https://10.200.0.13:2379"
+export LOCAL_ETCD_CERT_DIR="${ENV_ROOT}/../etcd/cert/dev"
+
+# 可选配置
 export SCALE_NODES=("10.200.0.11")
 export REMOVE_NODES=("10.200.0.11")
 
 export MASTER_ADVERTISE_ADDRESS="10.200.0.15"
 # export KUBE_SERVER="https://${MASTER_ADVERTISE_ADDRESS}:6443"
-
-export ETCD_SERVERS="https://10.200.0.15:2379,https://10.200.0.14:2379,https://10.200.0.13:2379"
-
-export LOCAL_ETCD_CERT_DIR="${ENV_ROOT}/../etcd/cert/dev"
 
 export REGISTRY_DOMAIN="ccr.ccs.tencentyun.com"
 export IMAGE_PATH="mzkube"
