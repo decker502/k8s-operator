@@ -1,0 +1,36 @@
+[Unit]
+Description=Kubernetes Controller Manager
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+
+[Service]
+# ClusteRole: system:kube-controller-manager 的权限很小，
+# 只能创建 secret、serviceaccount 等资源对象，各 controller 
+# 的权限分散到 ClusterRole system:controller:XXX 中。
+# 需要在 kube-controller-manager 的启动参数中添加 --use-service-account-credentials=true
+
+ExecStart=${KUBE_BIN_DIR}/kube-controller-manager \
+  --address=127.0.0.1 \
+  --kubeconfig=${CFG_DIR}/kube-controller-manager.kubeconfig \
+  --allocate-node-cidrs=true \
+  --service-cluster-ip-range=${SERVICE_CLUSTER_IP_RANGE} \
+  --cluster-cidr=${CLUSTER_CIDR} \
+  --cluster-name=kubernetes \
+  --cluster-signing-cert-file=${CERT_DIR}/ca.pem \
+  --cluster-signing-key-file=${CERT_DIR}/ca-key.pem \
+  --service-account-private-key-file=${CERT_DIR}/ca-key.pem \
+  --root-ca-file=${CERT_DIR}/ca.pem \
+  --horizontal-pod-autoscaler-use-rest-clients=false \
+  --node-monitor-grace-period=40s \
+  --node-monitor-period=5s \
+  --pod-eviction-timeout=5m0s \
+  --feature-gates=RotateKubeletServerCertificate=true \
+  --use-service-account-credentials=true \
+  --experimental-cluster-signing-duration=87600h0m0s \
+  --leader-elect=true \
+  --controllers=*,tokencleaner \
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

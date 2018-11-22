@@ -1,0 +1,40 @@
+[Unit]
+Description=Kubernetes API Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=network.target
+
+[Service]
+ExecStartPre=/usr/bin/mkdir -p /var/log/kube
+ExecStart=/opt/kubernetes/bin/kube-apiserver \
+  --enable-admission-plugins=Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota,NodeRestriction \
+  --bind-address=0.0.0.0 \
+  --authorization-mode=Node,RBAC \
+  --kubelet-https=true \
+  --enable-bootstrap-token-auth \
+  --service-cluster-ip-range=${SERVICE_CLUSTER_IP_RANGE} \
+  --service-node-port-range=${NODE_PORT_RANGE} \
+  --tls-cert-file=${CERT_DIR}/kube-apiserver.pem \
+  --tls-private-key-file=${CERT_DIR}/kube-apiserver-key.pem \
+  --client-ca-file=${CERT_DIR}/ca.pem \
+  --service-account-key-file=${CERT_DIR}/ca-key.pem \
+  --etcd-cafile=${KUBE_ETCD_CAFILE} \
+  --etcd-certfile=${KUBE_ETCD_CERTFILE} \
+  --etcd-keyfile=${KUBE_ETCD_KEYFILE} \
+  --etcd-servers=${ETCD_SERVERS} \
+  --enable-swagger-ui=true \
+  --allow-privileged=true \
+  --audit-log-maxage=30 \
+  --audit-log-maxbackup=3 \
+  --audit-log-maxsize=100 \
+  --audit-log-path=/var/log/kube/kube-audit.log \
+  --audit-policy-file=${CFG_DIR}/audit-policy.yaml \
+  --event-ttl=1h \
+  --runtime-config=api/all=true,admissionregistration.k8s.io/v1alpha1=true \
+  --v=0
+Restart=on-failure
+RestartSec=5
+Type=notify
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
